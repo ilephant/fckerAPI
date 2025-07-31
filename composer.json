@@ -1,0 +1,41 @@
+{
+    "name": "fcker/api",
+    "description": "PHP API Framework",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Денис Лапшин",
+            "email": "denis@l5n.ru"
+        }
+    ],
+    "require": {
+        "php": ">=8.2"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Fcker\\Framework\\": "framework/",
+            "Fcker\\Application\\": "application/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true
+    },
+    "scripts": {
+        "test": "phpunit",
+        "post-install-cmd": [
+            "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
+        ]
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
