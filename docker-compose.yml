@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "8080:80"
+    environment:
+      - APP_ENV=production
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_DATABASE=fcker_api
+      - DB_USERNAME=fcker_user
+      - DB_PASSWORD=fcker_password
+      - JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
+    depends_on:
+      - db
+    volumes:
+      - ./logs:/var/log/nginx
+      - .:/var/www/html
+    networks:
+      - fcker-network
+
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: fcker_api
+      MYSQL_USER: fcker_user
+      MYSQL_PASSWORD: fcker_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+      - ./docker/mysql.cnf:/etc/mysql/conf.d/mysql.cnf
+    networks:
+      - fcker-network
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      PMA_USER: fcker_user
+      PMA_PASSWORD: fcker_password
+    ports:
+      - "8081:80"
+    depends_on:
+      - db
+    networks:
+      - fcker-network
+
+volumes:
+  mysql_data:
+
+networks:
+  fcker-network:
+    driver: bridge 
