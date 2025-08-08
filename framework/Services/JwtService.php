@@ -3,8 +3,9 @@
 namespace Fcker\Framework\Services;
 
 use Exception;
+use Fcker\Framework\Contracts\TokenServiceInterface;
 
-class JwtService
+class JwtService implements TokenServiceInterface
 {
     private string $secret;
     private string $algorithm;
@@ -71,7 +72,6 @@ class JwtService
                 return null;
             }
 
-            // Проверяем подпись
             $expectedSignature = $this->base64UrlEncode(
                 hash_hmac('sha256', $headerB64 . '.' . $payloadB64, $this->secret, true)
             );
@@ -80,7 +80,6 @@ class JwtService
                 return null;
             }
 
-            // Проверяем время истечения
             if (isset($payload['exp']) && $payload['exp'] < time()) {
                 return null;
             }
@@ -94,12 +93,11 @@ class JwtService
     public function refreshTokens(string $refreshToken): ?array
     {
         $payload = $this->verifyToken($refreshToken);
-        
+
         if (!$payload || !isset($payload['type']) || $payload['type'] !== 'refresh') {
             return null;
         }
 
-        // Удаляем служебные поля
         unset($payload['iat'], $payload['exp'], $payload['iss'], $payload['aud'], $payload['type']);
 
         return [
@@ -128,11 +126,11 @@ class JwtService
     {
         $data = strtr($data, '-_', '+/');
         $remainder = strlen($data) % 4;
-        
+
         if ($remainder) {
             $data .= str_repeat('=', 4 - $remainder);
         }
-        
+
         return base64_decode($data);
     }
-} 
+}
